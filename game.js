@@ -5,6 +5,7 @@ canvas.height = canvas.width * 1.2
 var tile_width = (canvas.width)/8
 var r = 0.9 * canvas.width / (16 * Math.sqrt(2))
 
+//Board.
 function tile_board(){
 	for (i = 0; i<64; i++){
 		if( (i + Math.floor(i/8)) % 2 == 0) {
@@ -16,9 +17,7 @@ function tile_board(){
 	}	
 }
 
-
 context.fillRect(0, canvas.width, canvas.width, 100);
-
 
 function show_piece_at(text_string, xy_array, color){
 	var x = xy_array[0]; var y = xy_array[1]
@@ -45,6 +44,52 @@ function show_piece_at(text_string, xy_array, color){
 
 // This could be done in one 32 element array,
 // Let's keep it explicit for now.
+
+//Armies.
+var white = [];
+var black = [];
+
+//Units.
+function Piece (color, location_x, location_y) {
+	this.radius = r;
+	this.color = color;
+	this.location_x = location_x;
+	this.location_y = location_y;
+	this.getLocation = function () {
+
+	};
+};
+
+function Rook() {
+	this.move = function () {
+
+	};
+};
+Rook.proto = new Piece();
+
+function Knight() {
+	this.move = function () {
+
+	};
+};
+
+function Bishop() {
+	this.move = function () {
+
+	};
+};
+
+function Queen() {
+	this.move = function () {
+
+	};
+};
+
+function King() {
+	this.move = function () {
+
+	};
+};
 
 var wR =  [0.5 * tile_width, 0.5 * tile_width, 'alive']
 var wk =  [1.5 * tile_width, 0.5 * tile_width, 'alive']
