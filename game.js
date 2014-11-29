@@ -1,11 +1,22 @@
-
 var canvas = document.getElementById("free_chess_canvas");
 var context = canvas.getContext("2d");
 canvas.width = 500
 canvas.height = canvas.width * 1.2
 var tile_width = (canvas.width)/8
 var r = 0.9 * canvas.width / (16 * Math.sqrt(2))
-var dragging
+var dragging; var mouseDown;
+var canvasX; var canvasY;
+var x_del; var y_del;
+
+function median(values) {
+    values.sort( function(a,b) {return a - b;} );
+    var half = Math.floor(values.length/2);
+    if(values.length % 2){
+        return values[half];
+    }else{
+        return (values[half-1] + values[half]) / 2.0;
+    }
+}
 
 //Board.
 function tile_board(){
@@ -15,6 +26,8 @@ function tile_board(){
 			var topmost_y = Math.floor(i/8) * tile_width
 			context.fillStyle = "grey"
 			context.fillRect(leftmost_x, topmost_y, tile_width, tile_width);
+			context.fillStyle = "blue"
+			context.fillRect(0, canvas.width, canvas.width, 100);
 		}
 	}	
 }
@@ -22,8 +35,6 @@ function tile_board(){
 function distance(x1, y1, x2, y2){
   return Math.sqrt(Math.pow((x1-x2),2)+Math.pow((y1-y2),2));
 }
-
-context.fillRect(0, canvas.width, canvas.width, 100);
 
 function show_piece_at(text_string, xy_array, color){
 	var x = xy_array[0]; var y = xy_array[1]
@@ -163,6 +174,17 @@ var handlemousemove = function(event){
   var coords = canvas.relMouseCoords(event);
   canvasX = coords.x;
   canvasY = coords.y;
+  if (dragging){
+  	foo[dragging][2] = 'dead'
+  	canvas.width = canvas.width
+  	tile_board()
+	show_pieces()
+  	show_piece_at(foo[dragging][4], 
+  		[
+  		foo[dragging][0],
+		median([canvasY + y_del, foo[dragging][1] - tile_width, foo[dragging][1]])
+  		], foo[dragging][3])
+  }
 
   // refresh_canvas();
   // if (mouseDown && event.which == 1 && value_of_moving_circle > 0){
@@ -178,33 +200,48 @@ var handlemousemove = function(event){
   //   print_string_at_xy(value_of_moving_circle, canvasX + clickXdel, canvasY + clickYdel);
   // }
   // show_piece_at('foo', [canvasX, canvasY], 'black')
-	for (var key in foo) {
-	  	if (foo.hasOwnProperty(key)) {
-	    	if (distance(foo[key][0],foo[key][1], canvasX, canvasY)<= r){
-	    		show_piece_at(foo[key][4], [foo[key][0],foo[key][1]], 'red')
-	   		}
-	  	}
-	}
+	// for (var key in foo) {
+	//   	if (foo.hasOwnProperty(key)) {
+	//     	if (distance(foo[key][0],foo[key][1], canvasX, canvasY)<= r){
+	//     		// show_piece_at(foo[key][4], [foo[key][0],foo[key][1]], 'red')
+	//    		}
+	//   	}
+	// }
 }
 
-function xy_to_piece(x,y){
+
+function xy_to_piece(){
 	for (var key in foo) {
 	  	if (foo.hasOwnProperty(key)) {
 	    	if (distance(foo[key][0],foo[key][1], canvasX, canvasY)<= r){
-	    		return key
+	    		x_del = foo[key][0] - canvasX
+	    		y_del = foo[key][1] - canvasY
+				return key
 	   		}
 	  	}
 	}
-	return null
+	return false
 }
 
 var handlemouseup = function(event){
-//   var a; var b;
-//   refresh_canvas();
-//   saveCanvas();
-  mouseDown = false;
-//   if (dragging){
-///     var ab = ab_from_xy(canvasX+clickXdel, canvasY+clickYdel);
+//  var a; var b;
+//  refresh_canvas();
+// 	saveCanvas();
+ 	mouseDown = false
+ 	canvas.style.cursor="default"
+ 	if (dragging){
+ 		foo[dragging][2] = 'alive'
+ 		foo[dragging][1] = median(
+ 			[
+ 				foo[dragging][1], 
+ 				canvasY + y_del,
+ 				foo[dragging][1] - tile_width
+ 			]
+ 		)
+ 	}
+ 	dragging = false
+//  if (dragging){
+//     var ab = ab_from_xy(canvasX+clickXdel, canvasY+clickYdel);
 //     a = ab[0]; b = ab[1];
 //     if (distance(atox[a], btoy[b], canvasX+clickXdel, canvasY+clickYdel) < r){
 //       labels[index(click_original_a, click_original_b)] = 0;
@@ -224,8 +261,11 @@ var handlemouseup = function(event){
 
 var handlemousedown = function(event) { // Where the clickiness happens.
 	mouseDown = true
- 	dragging = false
-
+ 	dragging = xy_to_piece()
+ 	canvas.style.cursor="none"
+ 	// show_piece_at(canvasX, [canvasX, canvasY], 'black')
+ 	// show_piece_at(canvasY, [canvasX, canvasY+2*r], 'black')
+ 	// show_piece_at()
 //   var a; var b;
 //   var ab = ab_from_xy(canvasX, canvasY);
 //   a = ab[0]; b = ab[1];
